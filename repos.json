@@ -1,6 +1,7 @@
 {
   "repos": {
     "Prestige": ["Android"],
-    "ProtocolDroid": ["Android"]
+    "ProtocolDroid": ["Android"],
+    "base-android-library": ["Android"]
   }
 }
