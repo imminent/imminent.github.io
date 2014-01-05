@@ -1,0 +1,48 @@
+---
+layout: post
+title: ! 'Library Spotlight: a Dagger for Stabbing Objects into Place'
+categories:
+- Android
+- Library Spotlight
+tags:
+- android
+- dependency injection
+status: draft
+type: post
+published: false
+meta: {}
+---
+<h2>Library</h2>
+<p style="padding-left:30px;"><a title="Dagger" href="http://square.github.com/dagger/">Dagger</a> (<a title="Dagger Maven Dependency" href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.squareup%22%20dagger">on Maven Central</a>) <span style="color:#b6b6b6;">version 0.9.1 at time of writing</span></p>
+
+<h2>Purpose</h2>
+<p style="padding-left:30px;"><span style="font-family:Georgia, 'Times New Roman', 'Bitstream Charter', Times, serif;">Often a class is dependent on the implementation of other external classes</span>. For proper modularity, the class shouldn't care <em>how </em>these classes are implemented. Furthermore, specific implementations could be interchangeable since the class is dependent on the <em>interface</em> and not the <em>implementation</em> of these classes. Dagger is an implementation of dependency injection that uses code generation and avoids extensive reflection to improve performance.</p>
+
+<h2>Advantage</h2>
+<p style="padding-left:30px;">Dependency injection frameworks allow for the creation of dependent objects while handling the deals of creating them. Instead of the developer having to implement Factory classes for different objects and using these factories where in classes dependent on the given object, the developer simply declares dependency on an object with <code><span style="color:#657a81;"><span style="color:#d30102;">@Inject </span>SomeClass variable</span></code> and uses that variable wherever the object is needed. By decoupling the class from the implementation of the classes it depends on, it is easy to modularize code. This facilitates testing through providing mock implementations of the external classes and facilitates code reusability through separating the code that is dependent on the specific project from code that is generalized to work <em>given </em>any specific project. It is about protecting code that changes as a group  code that doesn't change with the group, which is an important quality of maintainable code.</p>
+<p style="padding-left:30px;">Unlike Guice/Roboguice, Dagger was built specifically to work well on mobile devices, meaning performance and start time overhead are of extreme importance in the philosophy that guides Dagger. Dagger isn't tied to Android, it works as a general Java dependency injection library, but works well in an Android environment.</p>
+<p style="padding-left:30px;">A nice side-effect to the Dependency Injection pattern is that it groups the dependencies together, making it clearer what classes affect a given class. It's effectively documentation within the code.</p>
+
+<h2>Usage</h2>
+<p style="padding-left:30px;">As a general rule of thumb, if you would use the <code>new</code> keyword - don't - and use an injection instead. Whenever a class creates an object it becomes dependent on that object's implementation. The API (exposed methods and fields) define - hopefully - what is the object expects to receive and what should be expected from the object given what it has received (these can be object state or method parameters). The dependent class hopes that the implementation of this API is correct, and that the expected outcome is the actual outcome, but it is up to the implementation of the API to meet that desire. Notice that the goal in the class is to get the expected outcome from the object it depends on and it doesn't care how that happens (this isn't to say that there aren't sometimes side-effects of the specific implementation that the developer <em>does</em> care about like sending an HTTP request), rather than to create the object. So, through Inversion of Control, the class let's someone else handle creating the object - even which implementation to use - and just requests that the object is passed to it. Note that this is recursive. Dependency Injection is designed to fill in for that <em>someone</em>.</p>
+
+<pre style="padding-left:30px;background:#FDF6E3;"><span style="color:#657a81;"><span style="color:#b58900;">class</span> ExampleClass {
+    <span style="color:#d30102;">@Inject</span> HttpClient client;
+    <span style="color:#d30102;">@Inject</span> TokenGenerator token_generator;
+
+    <span style="color:#b58900;">public void</span> createAccount(String account_name, String encrypted_password) {
+        <span style="color:#93a1a1;">// Creates a token for the account that assigns an account to a group
+        // This could return the same token ever time to place every account into the same group
+        // Or this could return a UID to place every account into a distinct group
+        // Or this could return a token based on if it is before or after a due date</span>
+        <span style="color:#b58900;">final int</span> token = token_generator.generateToken();
+        <span style="color:#93a1a1;">// Tells the client to create an account
+        // This will usually result in an HTTP request being set over the Internet
+        // But the specific approach to making that request is unimportant to this class
+        // Maybe it uses HTTPS or HTTP, maybe it uses the latest and greatest Java HTTP client library
+        // Maybe this class is under testing and an HttpClient is used that doesn't connect to the Internet</span>        
+        client.createAccount(account_name, encrypted_password, token);
+   }
+}</span></pre>
+<p style="padding-left:30px;">This example tries to accentuate the separation between what the class is actually dependent on from what the specific project (or module) is dependent on, which is effective what the developer's current goal is dependent on happening. When text needs to be written to a file,  the developer takes care to use a class that actually writes text to files and doesn't just hold it internally. However, a method that takes in operations to be queued to long-term storage and then executes them at some later time doesn't <em>actually </em>depend on the operations being written to files. In particular, if the given long-term storage writer is proven to work as desired for a specific domain of input, then all that remains is for the operation queuing method to be proven to only use the given long-term storage writer within that domain. In one mindset the developer might need the long-term storage writer to be able to return the queue even after the device has been powered off and on. In this mindset, the developer would likely depend on the operations to be written to a file, since the file will retain its state through a power off. In another mindset, the developer might need only to check that the operations that go into the queue are identical to the operations that come out of the queue. In this mindset, the developer would likely be using a testing framework and doesn't need the queue to survive a device power off, only that it held long enough to be returned.</p>
+<p style="padding-left:30px;">This library is pretty well-documented, and explains its capabilities well.</p>

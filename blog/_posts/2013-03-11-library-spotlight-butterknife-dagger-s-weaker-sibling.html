@@ -1,0 +1,42 @@
+---
+layout: post
+title: ! 'Library Spotlight: Butterknife, Dagger''s Weaker Sibling'
+categories:
+- Android
+- Library Spotlight
+tags:
+- android
+- dependency injection
+status: draft
+type: post
+published: false
+meta:
+  switch_like_status: '1'
+  _wpas_skip_3139000: '1'
+---
+<h2>Library</h2>
+<p style="padding-left:30px;"><a title="Butterknife" href="https://github.com/JakeWharton/butterknife">Butterknife</a> (<a title="Butterknife Maven Dependency" href="http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22butterknife%22">on Maven Central</a>) <span style="color:#b6b6b6;">version 1.2.0 at time of writting</span></p>
+
+<h2>Purpose</h2>
+<p style="padding-left:30px;">Replacement for <a title="Activity.findViewById(int)" href="http://developer.android.com/reference/android/app/Activity.html#findViewById(int)"><code>Activity.findViewById(int)</code></a> and <code><a title="View.findViewById(int)" href="http://developer.android.com/reference/android/view/View.html#findViewById(int)">View.findViewById(int)</a>.</code></p>
+
+<h2>Advantage</h2>
+<p style="padding-left:30px;">The first point is that there is nothing magical about butterknife. It simply generates the code like normal, and provides a method for use when you want to grab the <span style="color:#657a81;"><code>View</code></span>'s. The next point is that it provides a pretty semantic annotation-based declaration of the <span style="color:#657a81;"><code>View</code></span>'s to grab. Call it annotated View injection, which is technically different than dependency injection. Its just finding the reference to a View object that's current instantiated in the current Context.</p>
+
+{% highlight java %}
+public class ExampleActivity extends Activity {
+  @InjectView(R.id.title) /* package */TextView title;
+  @InjectView(R.id.go) /* package */Button go;
+  @InjectView(R.id.toggle) /* package */CheckBox toggle;
+
+  @Override public void onCreate(Bundle icicle) {
+    super.onCreate(icicle);
+    setContentView(R.layout.simple_activity);
+    Views.inject(this);
+    //TODO: User "injected" views…
+  }
+}
+{% endhighlight %}
+
+<p style="padding-left:30px;">Where <span style="color:#657a81;"><code>Views.inject(this);</code></span> executes the usual <span style="color:#657a81;"><code>findViewById</code></span> commands for the "injected" <span style="color:#657a81;"><code>View</code></span>'s. And you can see how it cleans up the <span style="color:#657a81;"><code>onCreate</code></span> code, and makes increases readability of the goal of retrieving the <code>View</code>s for use in the class. This injection can be used in <span style="color:#657a81;"><code>Fragment</code></span> and <span style="color:#657a81;"><code>View</code></span> classes, and arbitrary classes that are given an <span style="color:#657a81;"><code>Activity</code></span> or <span style="color:#657a81;"><code>View</code></span>.</p>
+<p style="padding-left:30px;">This library is pretty well-documented, and explains its capabilities well.</p>
